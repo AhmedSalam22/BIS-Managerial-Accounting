@@ -117,7 +117,9 @@ if st.sidebar.checkbox("Prepare Cost Statements" , False):
     }
 
     st.markdown("### mainpulated_Data")
-    st.write(mainpulated_Data)
+    if st.checkbox("Show mainpulated_Data" , False):
+        st.write(mainpulated_Data)
+
     if cost_type == "Absorption":
         st.markdown("#### Cost Statement under Absorption")
         st.markdown("""
@@ -176,4 +178,62 @@ if st.sidebar.checkbox("Prepare Cost Statements" , False):
         
         
         )
+    elif cost_type == "Direct":
+        st.markdown("### Cost Statement under Direct")
+        st.markdown("""
+        ```
+                Production Volume		   {pv}
+                Product Cost			
+                    DM			            {dm}
+                    DL			            {dl} 
+                    V.MFG OH			    {v_mfg_oh} 
+                            
+                        V.Cost of Goods Manufactured  {v_cgmfg}
+                + V.Cost of Beg F.G Inventory			 {v_cbfg}   
+                -V. Cost of Ending F.G Inventory		({v_cefg}) 
+                    V. Cost Of Good Sold			 {cogs}
+        ```
+                    """.format(
+                        pv = production_volume ,
+                        dm = dm * production_volume  ,
+                        dl = dl * production_volume, 
+                        v_mfg_oh = v_mfg_oh *  production_volume, 
+                        v_cgmfg =  mainpulated_Data["V.Cost of Goods Manufactured"] , 
+                        v_cbfg =  mainpulated_Data["Cost Of Beg F.G Inventory"] - mainpulated_Data["FC In Beg F.G inventory"] , 
+                        v_cefg = mainpulated_Data["Cost Of Ending F.G Inventory"] - mainpulated_Data["FC In Ending F.G inventory"],
+                        cogs = mainpulated_Data["V.Cost Of Goods Sold"]
+                    )
+                    )
+        st.markdown("### Income Statement under Direct")
+        st.markdown("""
+        ```
+        Sales Volume			{sv}
+        Sales Rvenue			{sr}
+        -V.Cost of Good sold		({vcogs})
+        -V.selling_Cost			({vsc})
+        Contribution Margin		{cm}
+        - F.MFG OH			({f_mfg_oh})
+        -F.Selling			({fs})
+        -f.administrative		({fa})
+            Net Operating Income	{noi}
+
+        ```
+        """.format(
+                    sv = sales_volume ,
+                    sr = mainpulated_Data["Sales Revenue"] , 
+                    vcogs =  mainpulated_Data["V.Cost Of Goods Sold"] ,
+                    vsc = mainpulated_Data["V.selling Cost"] , 
+                    cm = mainpulated_Data["Contribution Margin"] ,
+                    f_mfg_oh = f_mfg_oh , 
+                    fs = f_selling,
+                    fa = f_administrative ,
+                    noi = mainpulated_Data["Contribution Margin"] - f_selling - f_administrative - f_mfg_oh
+
+
+
+        )
+        
+               )
+    else:
+        st.markdown("# Please select cost type")
 st.markdown("#### Copyright@Ahmed Maher Fouy Mohamed Salam 2020")

@@ -44,19 +44,26 @@ if st.sidebar.checkbox("High-Low Method Function" , False):
         # Create list from low to high volume  and cost
         volume_range = np.linspace(volume_low , volume_high , 10)
         volume_range = np.array(list(map(lambda x: int(x) , volume_range)))
+        volume_range[0] = 0
         # st.write(volume_range)
         cost_range =  total_fixed_cost + vc_unit * volume_range        
         # st.write(cost_range)
         predication_data = {
             "volume":volume_range , 
-            "cost" : cost_range
+            "semi-variable cost" : cost_range
         }
 
         df_predication = pd.DataFrame(predication_data)
-        # st.write(df_predication)
+        df_predication["FC"] = total_fixed_cost
+        df_predication["VC"] = vc_unit * volume_range 
+
+        st.title("Sample for predective model")
+        st.write(df_predication)
 
        
-        df_predication.plot(x= "volume" , y ="cost", kind="line")
+        # df_predication.plot(x= "volume" , y ="cost", kind="line")
+        # df_predication.plot(x= "volume" , y ="FC", kind="line")
+        df_predication.set_index("volume").plot.line()
         plt.title("Predection Model")
         plt.ylabel("cost")
         st.pyplot()

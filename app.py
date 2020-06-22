@@ -260,16 +260,93 @@ def cost_statement():
 
 
 
+def cheet_sheet():
+    st.markdown("""
+        |Cheet Sheet |
+        |------------|-----------------------------------------------|
+        |Key Assumptions of CVP Analysis|
+        |1.Selling price is constant.|
+        |2.Costs are linear and can be accurately divided into variable (constant per unit) and fixed (constant in total) elements.|
+        |3.In multiproduct companies, the sales mix is constant.|
+        |4.In manufacturing companies, inventories do not change (units produced = units sold)|
+        |CVP Relationships in Equation Form|	Profit = (Sales – Variable expenses) – Fixed expenses   or Profit = (CM ratio × Sales) – Fixed expenses |
+        |Contribution Margin Ratio (CM Ratio)|	CM per unit / SP per unit|
+        |Break-even (unit)|	Fixed expenses / CM per unit|
+        |Break-even (ratio)|	Fixed expenses / CM ratio|
+        |Unit sales to attainthe target profit|	(Target profit + Fixed expenses )/ CM per unit| 
+        |Dollar sales to attainthe target profit| 	(Target profit + Fixed expenses )/ CM Ratio| 
+        |Margin of safety in dollars |	Margin of safety in dollars = Total sales - Break-even sales|
+        |Degree ofoperating leverage|	Contribution margin  /  Net operating income|
+
+    """)
+
+
+
+def cvp():
+    sales_price = st.number_input("Sales Price" , 0.0)
+    units_sold = st.number_input("Number of units sold", 0.0)
+    vc_unit = st.number_input("variable cost per unit", 0.0)
+    total_fixed_cost = st.number_input("Total Fixed Cost", 0.0 , key=2)
+
+    total_variable =  vc_unit * units_sold
+    sales_revenue = sales_price  * units_sold
+    cm = sales_revenue - total_variable
+    noi =   cm - total_fixed_cost
+
+    if st.checkbox("Show Mainpulated Data" , False):
+        mainpulated_Data  = {
+                "Sales revenue":sales_revenue , 
+                "Total Variable cost":total_variable ,
+                "contribution margin": cm , 
+                "Net Operation income":noi  ,
+                "CM / unit" : sales_price - vc_unit , 
+                "CM Ratio": (cm / sales_revenue) * 100 , 
+                "break-even point (unit)": total_fixed_cost / (sales_price - vc_unit) , 
+                "break-even point ($ value )": total_fixed_cost / (cm / sales_revenue) ,
+        }
+
+        st.write(pd.melt(pd.DataFrame(mainpulated_Data , index=["result"]) , var_name="Mainpulated data" , ))
+    
+        # Visualize break even
+        units_range = np.linspace(0 , mainpulated_Data["break-even point (unit)"] * 2 , 10)
+        units_range = np.array(list(map(lambda x: int(x), units_range)))
+        # st.write(units_range)
+
+        df_BP = pd.DataFrame(units_range , columns=["units"])
+        # st.write(df_BP)
+
+        df_BP["Total Costs"] = df_BP["units"] * vc_unit + total_fixed_cost
+        df_BP["Total revenue"] =  df_BP["units"] * sales_price
+        
+        if st.checkbox("Do you want to see a sample" , False):
+            st.title("Sample")
+            st.write(df_BP)
+        df_BP.set_index("units").plot.line()
+        plt.title("Break even point")
+        plt.ylabel("Value")
+        st.pyplot()
+
 
 
 # ----------------------sidebar-------------------------
 # High Low Method
 if st.sidebar.checkbox("High-Low Method Function" , False):
+    st.title("High-Low Method")
     high_low_method()
 
 # Cost Statement
 if st.sidebar.checkbox("Prepare Cost Statements" , False):
+    st.title("Cost Statements")
     cost_statement()
+# CVP
+if st.sidebar.checkbox("Cost volume profit analysis (CVP)" , False):
+    st.title("CVP")
+
+    if st.checkbox("cheat sheet" , False):
+        cheet_sheet()
+    
+    cvp()
+
 
 
 st.sidebar.markdown('<a href="mailto:ahmedsalam22@gmail.com">Contact us!</a>', unsafe_allow_html=True)

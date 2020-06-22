@@ -2,11 +2,12 @@ import streamlit as st
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
-import base64
+import graphviz as graphviz
 
 
 
 st.title("Mangerial Accounting")
+
 
 
 def high_low_method():
@@ -283,10 +284,10 @@ def cheet_sheet():
 
 
 def cvp():
-    sales_price = st.number_input("Sales Price" , 0.0)
-    units_sold = st.number_input("Number of units sold", 0.0)
-    vc_unit = st.number_input("variable cost per unit", 0.0)
-    total_fixed_cost = st.number_input("Total Fixed Cost", 0.0 , key=2)
+    sales_price = st.number_input("Sales Price" , 10.0)
+    units_sold = st.number_input("Number of units sold", 100.0)
+    vc_unit = st.number_input("variable cost per unit", 7.0)
+    total_fixed_cost = st.number_input("Total Fixed Cost", 150.0 , key=2)
 
     total_variable =  vc_unit * units_sold
     sales_revenue = sales_price  * units_sold
@@ -303,10 +304,42 @@ def cvp():
                 "CM Ratio": (cm / sales_revenue) * 100 , 
                 "break-even point (unit)": total_fixed_cost / (sales_price - vc_unit) , 
                 "break-even point ($ value )": total_fixed_cost / (cm / sales_revenue) ,
+                "Margin of safety $": sales_revenue - total_fixed_cost / (cm / sales_revenue) ,
+                "Margin of safety (unit)" :units_sold -   total_fixed_cost / (sales_price - vc_unit), 
+                "Margin of safety ratio": (units_sold -   total_fixed_cost / (sales_price - vc_unit)) / units_sold ,
+                "operating leverage": cm / noi ,
+
+
         }
 
         st.write(pd.melt(pd.DataFrame(mainpulated_Data , index=["result"]) , var_name="Mainpulated data" , ))
-    
+        if st.checkbox("Do you want see contribution format income statement" , False):
+            st.markdown("""
+            ```
+                        contribution format income statement
+                ---------------------------------------------------
+                Sales revenue                       |   {sr}
+                Less: Variable cost                 |   {va}
+                ----------------------------------------------------
+                Contribution Margin                 |   {cm}
+                Less  Total fixed cost              |   {fc}
+                -----------------------------------------------------
+                Net Income/ loss                    |   {noi}
+                ---------------------------------------------------- 
+            """.format(
+                sr = mainpulated_Data["Sales revenue"] , 
+                va = mainpulated_Data["Total Variable cost"] ,
+                cm = mainpulated_Data["contribution margin"] , 
+                fc = total_fixed_cost , 
+                noi = mainpulated_Data["Net Operation income"]
+            )
+            
+            )
+        if st.checkbox("I want to achieve a target profit by X , then how many unit should i sell?" , False):
+            target_profit = st.number_input("input your target profit", 0.0)
+            st.markdown("### you should sell  {}  unit to achieve this target".format(int((total_fixed_cost + target_profit) / mainpulated_Data["CM / unit"])))
+        
+
         # Visualize break even
         units_range = np.linspace(0 , mainpulated_Data["break-even point (unit)"] * 2 , 10)
         units_range = np.array(list(map(lambda x: int(x), units_range)))
@@ -325,8 +358,6 @@ def cvp():
         plt.title("Break even point")
         plt.ylabel("Value")
         st.pyplot()
-
-
 
 # ----------------------sidebar-------------------------
 # High Low Method
@@ -350,5 +381,4 @@ if st.sidebar.checkbox("Cost volume profit analysis (CVP)" , False):
 
 
 st.sidebar.markdown('<a href="mailto:ahmedsalam22@gmail.com">Contact us!</a>', unsafe_allow_html=True)
-
 st.markdown("#### Copyright@Ahmed Maher Fouy Mohamed Salam 2020")

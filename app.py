@@ -2,12 +2,14 @@ import streamlit as st
 import pandas as pd 
 import numpy as np
 import matplotlib.pyplot as plt
+import base64
+
 
 
 st.title("Mangerial Accounting")
 
-# High Low Method
-if st.sidebar.checkbox("High-Low Method Function" , False):
+
+def high_low_method():
     st.markdown("""
                 ##### Note: High-Low method used to seperate semi-variable into (Fixed Cost and variable cost)
                 """)
@@ -69,10 +71,7 @@ if st.sidebar.checkbox("High-Low Method Function" , False):
         st.pyplot()
 
 
-
-# Cost Statement
-
-if st.sidebar.checkbox("Prepare Cost Statements" , False):
+def cost_statement():
     production_volume = st.number_input("Production Volume" , 12000.0)
     sales_volume = st.number_input("sales Volume" , 9000.0)
     sales_price = st.number_input("Sales price" , 20.0)
@@ -236,4 +235,43 @@ if st.sidebar.checkbox("Prepare Cost Statements" , False):
                )
     else:
         st.markdown("# Please select cost type")
+
+    if production_volume > sales_volume:
+        st.markdown("##### Note: Net income under absorption is greater than net income under direct")
+    elif production_volume < sales_volume:
+        st.markdown("##### Note: Net income under absorption is less than net income under direct")
+    
+    if st.checkbox("Do you want to see Reconciliation " , False):
+        st.markdown("""
+        ```
+                Reconciliation			
+        Net Income Under Absorption			{ab}
+        +Fc IN Beg F.G Inventory			{fcb}
+        -Fc IN Ending F.G Inventory			({fce})
+        Net Income Under Direct			        {d}
+        """.format(
+            ab = mainpulated_Data["Gross Profit"] - mainpulated_Data["V.selling Cost"] - f_selling - f_administrative , 
+            fcb = mainpulated_Data["FC In Beg F.G inventory"] ,
+            fce = mainpulated_Data["FC In Ending F.G inventory"]  , 
+            d = mainpulated_Data["Contribution Margin"] - f_selling - f_administrative - f_mfg_oh
+
+        ) 
+                 )
+
+
+
+
+
+# ----------------------sidebar-------------------------
+# High Low Method
+if st.sidebar.checkbox("High-Low Method Function" , False):
+    high_low_method()
+
+# Cost Statement
+if st.sidebar.checkbox("Prepare Cost Statements" , False):
+    cost_statement()
+
+
+st.sidebar.markdown('<a href="mailto:ahmedsalam22@gmail.com">Contact us!</a>', unsafe_allow_html=True)
+
 st.markdown("#### Copyright@Ahmed Maher Fouy Mohamed Salam 2020")
